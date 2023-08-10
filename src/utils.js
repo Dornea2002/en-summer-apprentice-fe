@@ -1,57 +1,9 @@
-import { createEvent } from './components/createEvent';
+export const kebabCase=(str)=> str.replaceAll(' ','-');
 
-/**
- *
- * @param {import("./mocks/database").TicketEvent} data
- */
-export const addPurchase = (data) => {
-  const purchasedEvents =
-    JSON.parse(localStorage.getItem('purchasedEvents')) || [];
-  purchasedEvents.push(data);
-  localStorage.setItem('purchasedEvents', JSON.stringify(purchasedEvents));
-};
+export const addPurchase =(data) => {
 
-/**
- *
- * @param {import("./mocks/database").TicketEvent[]} events
- */
-export const addEvents = (events) => {
-  const eventsDiv = document.querySelector('.events');
-  eventsDiv.innerHTML = 'No events available';
+    const purchasedEvent=JSON.parse(localStorage.getItem('purchasedEvent')) || [];
+    purchasedEvent.push(data);
+    localStorage.setItem('purchasedEvent',JSON.stringify(purchasedEvent));
 
-  if(events.length) {
-    eventsDiv.innerHTML = '';
-    events.forEach((event) => {
-      eventsDiv.appendChild(createEvent(event));
-    });
-  }
-};
-
-/**
- *
- * @param {string} str
- * @returns {string}
- */
-export const kebabCase = (str) => str.replaceAll(' ', '-');
-/**
- *
- * @param {string} searchTerm
- */
-export const handleSearch = async (searchTerm) => {
-  const response = await fetch('/api/ticketEvents');
-  /**
-   * @type {import("../../mocks/database").TicketEvent[]}
-   */
-  const tickets = await response.json();
-
-  const filteredTickets = tickets.filter((ticket) => {
-    return (
-      ticket.name.toLowerCase().includes(searchTerm) ||
-      ticket.description.toLowerCase().includes(searchTerm)
-    );
-  });
-
-  addEvents(filteredTickets);
-
-  return filteredTickets.length > 0;
 };
