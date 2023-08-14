@@ -132,7 +132,7 @@ const createEventElement = (eventData, title) => {
         <h2 class="event-title text=2xl font-bold">${eventName}</h2>
     </header>
     <div class="content">
-      <img src="${img}" class="event-image w-full height-200 rounded"
+      <img src="${'./src/assets/concert.jpeg'}" class="event-image w-full height-200 rounded">
       <p class="description text-gray-700 text-center text-sm">${eventDescription}</p>
       <p class="date text-gray-700 text-sm text-center">Date: ${formattedStartDate} - ${formattedEndDate}</p>
       <p class="venue text-gray-700 text-center text-sm">Location: ${venueDTO.location}</p>
@@ -144,26 +144,19 @@ const createEventElement = (eventData, title) => {
   const actions = document.createElement('div');
   actions.classList.add(...actionsWrapperClasses);
 
-   const categoriesOptions = ticketCategory && Array.isArray(ticketCategory)
-    ? ticketCategory.map((category) =>
-        `<option value=${category.ticketCategoryID}>${category.description}</option>`
-      )
-    : '';
+  const categoriesOptions = ticketCategory && Array.isArray(ticketCategory)
+  ? ticketCategory.map((category) =>
+      `<option value=${category.ticketCategoryID}>${category.description}</option>`
+    )
+  : [];
 
-    const ticketSection = createSectionWithIcon('./src/assets/icons/ticket.png', `
-    <select id="ticketType" name="ticketType" class="select ${title}-ticket-type text-sm bg-white border border-gray-300 rounded px-2 py-1 ">
-      ${categoriesOptions.join('\n')}
-    </select>
-  
-  `);
-  
-    const ticketTypeMarkup = `
-        <h2 class="text-lg font-bold mb-2">Choose Ticket Type:</h2>
-        <select id="ticketType" name="ticketType"> 
-        ${categoriesOptions.join('\n')}
-        </select>`;
-  
-        console.log(categoriesOptions);
+  const ticketTypeMarkup = `
+  <h2 class="text-lg font-bold mb-2">Choose Ticket Type:</h2>
+  <select id="ticketType" name="ticketType" class="select ${title}-ticket-type text-sm bg-white border border-gray-300 rounded px-2 py-1 ">
+    ${categoriesOptions.join('\n')}
+  </select>
+  <!-- ... (rest of the ticket type markup) -->
+`;
   
     actions.innerHTML = ticketTypeMarkup;
 
@@ -202,17 +195,15 @@ const createEventElement = (eventData, title) => {
     const increase = document.createElement('button');
     increase.classList.add(...increaseBtnClasses);
     increase.innerText = '+';
-    increase.addEventListener('click', () =>
-    {
-        input.value = parseInt(input.value);
-        if(currentQuantity > 0){
+    increase.addEventListener('click', () => {
+      const currentQuantity = parseInt(input.value) + 1;
+      input.value = currentQuantity;
+      if (currentQuantity > 0) {
           addToCart.disabled = false;
-        }
-        else {
+      } else {
           addToCart.disabled = true;
-        }
-    } 
-    );
+      }
+  });
 
     const decrease = document.createElement('button');
     decrease.classList.add(...decreaseBtnClasses);
@@ -260,30 +251,54 @@ const handleAddToCart = (title, id, input, addToCart) => {
   const ticketType = document.querySelector(`.${kebabCase(title)}-ticket-type`).value;
   const quantity = input.value;
   if(parseInt(quantity)){
-    const customerID=1;
+    const userId=1;
+    // fetch(`http://localhost:8080/orders/findBy/${userId}`, {
+    //   methot:"POST",
+    //   headers:{
+    //     "Content-Type":"application/json",
+    //   },
+    //   body:JSON.stringify({
+    //     ticketType:+ticketType,
+    //     eventID: id,
+    //     quantity:+quantity,
+    //   })
+    // }).then((response)=> {
+    //   return response.json().then((data)=>{
+    //     if(!response.ok){
+    //       console.log("Something went wrong...");
+    //     }
+    //     return data;
+    //   })
+    // }).then((data) =>{
+    //   addPurchase(data);
+    //   console.log("Done!");
+    //   input.value = 0;
+    //   addToCart.disabled = true;
+    // });
+
     fetch(`http://localhost:8080/orders/findBy/${userId}`, {
-      methot:"POST",
-      headers:{
-        "Content-Type":"application/json",
-      },
-      body:JSON.stringify({
-        ticketType:+ticketType,
-        eventID: id,
-        quantity:+quantity,
-      })
-    }).then((response)=> {
-      return response.json().then((data)=>{
-        if(!response.ok){
-          console.log("Something went wrong...");
-        }
-        return data;
-      })
-    }).then((data) =>{
-      addPurchase(data);
-      console.log("Done!");
-      input.value = 0;
-      addToCart.disabled = true;
-    });
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    ticketType: +ticketType,
+    eventID: id,
+    quantity: +quantity,
+  }),
+}).then((response) => {
+  return response.json().then((data) => {
+    if (!response.ok) {
+      console.log("Something went wrong...");
+    }
+    return data;
+  });
+}).then((data) => {
+  addPurchase(data);
+  console.log("Done!");
+  input.value = 0;
+  addToCart.disabled = true;
+});
   }else{
     //Not integer. To be treated
   }
