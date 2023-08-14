@@ -1,4 +1,3 @@
-import { create } from "domain";
 import {usesStyles} from './src/components/styles';
 import { addPurchase, kebabCase } from './src/utils';
 
@@ -7,16 +6,6 @@ function navigateTo(url) {
   history.pushState(null, null, url);
   renderContent(url);
 }
-// HTML templates
-// function getHomePageTemplate() {
-//   return `
-//    <div id="content" >
-//       <img src="./src/assets/bannerHomePage.jpeg" alt="summer">
-//       <div class="events flex items-center justify-center flex-wrap">
-//       </div>
-//     </div>
-//   `;
-// }
 
 
 function getHomePageTemplate() {
@@ -63,7 +52,7 @@ function setupMobileMenuEvent() {
   }
 }
 
-function setupPopstateEvent() {
+function setupPopstateEvent() {``
   window.addEventListener('popstate', () => {
     const currentUrl = window.location.pathname;
     renderContent(currentUrl);
@@ -104,7 +93,7 @@ const addEvents = (events) => {
   eventsDiv.innerHTML = 'No invents';
   if(events.length){
     eventsDiv.innerHTML = '';
-    events.array.forEach(event => {
+    events.forEach(event => {
       eventsDiv.appendChild(createEvent(event)); //introducing event in the container to be displayed
     });
   }
@@ -112,7 +101,7 @@ const addEvents = (events) => {
 };
 
 const createEvent = (eventData) => {
-  const title = kebabCase(eventData.eventType.name);
+  const title = kebabCase(eventData.eventName);
   const eventElement = createEventElement(eventData, title);
 
   return eventElement;
@@ -155,24 +144,27 @@ const createEventElement = (eventData, title) => {
   const actions = document.createElement('div');
   actions.classList.add(...actionsWrapperClasses);
 
-  const categoriesOptions = ticketCategory.map((category) =>
-  `<option value=${category.ticketCategoryID}>${category.description}</option>`);
+   const categoriesOptions = ticketCategory && Array.isArray(ticketCategory)
+    ? ticketCategory.map((category) =>
+        `<option value=${category.ticketCategoryID}>${category.description}</option>`
+      )
+    : '';
 
-  const ticketSection = createSectionWithIcon('./src/assets/icons/ticket.png', `
-  <select id="ticketType" name="ticketType" class="select ${title}-ticket-type text-sm bg-white border border-gray-300 rounded px-2 py-1 ">
-    ${categoriesOptions.join('\n')}
-  </select>
-
-`);
-
-  const ticketTypeMarkup = `
-  <h2 class="text-lg font-bold mb-2">Choose Ticket Type:</h2>
-  <select id="ticketType" name="ticketType" class="select ${title}-ticket-type border border
-    ${categoriesOptions.join('/n')}
+    const ticketSection = createSectionWithIcon('./src/assets/icons/ticket.png', `
+    <select id="ticketType" name="ticketType" class="select ${title}-ticket-type text-sm bg-white border border-gray-300 rounded px-2 py-1 ">
+      ${categoriesOptions.join('\n')}
     </select>
-  `;
-    console.log(categoriesOptions);
-
+  
+  `);
+  
+    const ticketTypeMarkup = `
+        <h2 class="text-lg font-bold mb-2">Choose Ticket Type:</h2>
+        <select id="ticketType" name="ticketType"> 
+        ${categoriesOptions.join('\n')}
+        </select>`;
+  
+        console.log(categoriesOptions);
+  
     actions.innerHTML = ticketTypeMarkup;
 
     const quantity = document.createElement('div');
