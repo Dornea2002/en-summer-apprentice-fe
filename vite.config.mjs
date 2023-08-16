@@ -8,3 +8,21 @@ export default {
     },
   },
 };
+
+// server: {
+
+//   proxy: {
+
+//     "/api/Event/GetAll": {
+
+//       target: "https://localhost:5173";
+
+//       changeOrigin: true;
+
+//       secure: false;
+
+//     };
+
+//   };
+
+// };

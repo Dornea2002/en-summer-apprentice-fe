@@ -77,7 +77,8 @@ function renderHomePage(){
 }
 
 async function fetchTicketEvents(){
-  const response = await fetch('http://localhost:8080/event');
+  // const response = await fetch('http://localhost:8080/event');
+  const response = await fetch('http://localhost:7224/api/Event/GetAll');
   // console.log(response);
 
   const data = await response.json();
@@ -135,9 +136,9 @@ const createEventElement = (eventData, title) => {
       <img src="${'./src/assets/concert.jpeg'}" class="event-image w-full height-200 rounded">
       <p class="description text-gray-700 text-center text-sm">${eventDescription}</p>
       <p class="date text-gray-700 text-sm text-center">Date: ${formattedStartDate} - ${formattedEndDate}</p>
-      <p class="venue text-gray-700 text-center text-sm">Location: ${venueDTO.location}</p>
+      <p class="venue text-gray-700 text-center text-sm">Location: ${venueDTO ? venueDTO.location : 'Unknown Location'}</p>
     </div>
-    `;
+  `;
   eventDiv.innerHTML = contentMarkup;
 
   // create ticket type selection and quantity input
@@ -252,31 +253,33 @@ const handleAddToCart = (title, id, input, addToCart) => {
   const quantity = input.value;
   if(parseInt(quantity)){
     const userId=1;
-    // fetch(`http://localhost:8080/orders/findBy/${userId}`, {
-    //   methot:"POST",
-    //   headers:{
-    //     "Content-Type":"application/json",
-    //   },
-    //   body:JSON.stringify({
-    //     ticketType:+ticketType,
-    //     eventID: id,
-    //     quantity:+quantity,
-    //   })
-    // }).then((response)=> {
-    //   return response.json().then((data)=>{
-    //     if(!response.ok){
-    //       console.log("Something went wrong...");
-    //     }
-    //     return data;
-    //   })
-    // }).then((data) =>{
-    //   addPurchase(data);
-    //   console.log("Done!");
-    //   input.value = 0;
-    //   addToCart.disabled = true;
-    // });
+    // fetch(`http://localhost:8080/orders/create`, {
+    fetch(`http://localhost:7224/api/Order/Patch`, {
+      methot:"POST",
+      headers:{
+        "Content-Type":"application/json",
+      },
+      body:JSON.stringify({
+        ticketType:+ticketType,
+        eventID: id,
+        quantity:+quantity,
+      })
+    }).then((response)=> {
+      return response.json().then((data)=>{
+        if(!response.ok){
+          console.log("Something went wrong...");
+        }
+        return data;
+      })
+    }).then((data) =>{
+      addPurchase(data);
+      console.log("Done!");
+      input.value = 0;
+      addToCart.disabled = true;
+    });
 
-    fetch(`http://localhost:8080/orders/findBy/${userId}`, {
+    // fetch(`http://localhost:8080/orders/findBy/${userId}`, {
+      fetch(`http://localhost:7224/api/Order/GetByID/${userId}`, {
   method: "POST",
   headers: {
     "Content-Type": "application/json",
